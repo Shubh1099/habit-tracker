@@ -1,16 +1,21 @@
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const HabitSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User", // Reference to the User model
+    required: true,
+    index: true, // Index for faster querying of user's habits
+  },
   name: {
     type: String,
-    required: [true, "Habit name is required."], 
+    required: [true, "Habit name is required."],
     trim: true, // Removes whitespace from start/end
   },
   createdAt: {
     type: Date,
-    default: Date.now, 
+    default: Date.now,
   },
   // Array to store the dates when the habit was marked as completed
   completions: [
@@ -29,7 +34,6 @@ const HabitSchema = new Schema({
     type: String,
     default: "#27a844", // A common green color, adjust if needed
   },
-
 });
 
 // Optional Index: Can potentially improve query performance for finding completions

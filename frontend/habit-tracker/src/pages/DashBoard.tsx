@@ -1,0 +1,126 @@
+import { useState, useEffect, useCallback } from 'react';
+
+import { Habit } from '../types';
+import * as api from '../services/api';
+import HabitList from '../components/HabitList';
+import HabitForm from '../components/HabitForm';
+
+function DashboardPage() {
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  // --- Updated Effect for Initial Data Fetch with Delay ---
+  useEffect(() => {
+    const isMounted = true;
+    let loadingTimerId: NodeJS.Timeout | null = null;
+    console.log("[DashboardPage] Fetching habits effect running."); // Renamed log source
+
+    const fetchAndLoad = async () => {
+      const startTime = Date.now();
+      if (isMounted) setLoading(true); // Set loading for this page's fetch
+      if (isMounted) setError(null);
+
+      try {
+        // API call will now automatically send token via interceptor
+        const fetchedHabits = await api.getHabits();
+        if (isMounted) {
+           setHabits(fetchedHabits);
+        }
+      } catch (err: any) { // Catch specific type if needed
+        console.error('[DashboardPage] Error fetching habits:', err);
+        if (isMounted) {
+            // Use error message from backend if available
+            const message = err?.message || 'Failed to fetch habits. Are you logged in?';
+            setError(message);
+        }
+      } finally {
+        if (isMounted) {
+           const endTime = Date.now();
+           const elapsedTime = endTime - startTime;
+           const remainingTime = Math.max(0, 2000 - elapsedTime); // Keep 2s delay
+           loadingTimerId = setTimeout(() => {
+               setLoading(false);
+           }, remainingTime);
+        }
+      }
+    };
+
+    fetchAndLoad();
+
+    return () => { /* ... cleanup function as before ... */ };
+  }, []); 
+
+  const handleAddHabit = useCallback(async (name: string) => {
+      if (!name.trim()) { alert("Habit name cannot be empty."); return; }
+      try {
+        const newHabit = await api.createHabit(name);
+        setHabits((prevHabits) => [newHabit, ...prevHabits]);
+      } catch (err: any) { setError(err?.message || 'Failed to add habit.'); console.error(err); }
+   }, []);
+
+  const handleDeleteHabit = useCallback(async (id: string) => {
+   
+    const originalHabits = [...habits];
+    /* ... existing logic using api.deleteHabit ... */
+     try {
+      setHabits((prevHabits) => prevHabits.filter((habit) => habit._id !== id));
+      await api.deleteHabit(id);
+    } catch (err: any) { setError(err?.message || 'Failed to delete habit.'); console.error(err); setHabits(originalHabits); }
+   }, [habits]);
+
+  const handleToggleCompletion = useCallback(async (id: string, dateString: string) => {
+     console.log("[DashboardPage] handleToggleCompletion called");
+     const originalHabits = [...habits];
+     try {
+        const updatedHabit = await api.toggleHabitCompletion(id, dateString);
+        setHabits((prevHabits) =>
+          prevHabits.map((habit) => (habit._id === id ? updatedHabit : habit))
+        );
+     } catch (err: any) { setError(err?.message || 'Failed to update habit completion.'); console.error(err); setHabits(originalHabits); }
+  }, [habits]);
+
+
+  return (
+    <>
+      {" "}
+      {/* Use Fragment or a simple div if needed */}
+      <header className="text-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-3xl font-bold text-gray-100">
+          My Habits
+        </h1>{" "}
+      </header>
+      <main>
+        <HabitForm onAddHabit={handleAddHabit} />
+        {loading && (
+          <p className="text-center text-5xl pt-50 text-gray-500 dark:text-gray-400 my-4">
+            Loading Habits...
+          </p>
+        )}
+        {!loading && error && (
+          <p
+            className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded relative mb-4 text-center"
+            role="alert"
+          >
+            {error}
+          </p>
+        )}
+
+        {!loading && !error && (
+          <>
+            {" "}
+            {/* Use Fragment to group Form and List */}
+            <HabitList
+              habits={habits}
+              onDeleteHabit={handleDeleteHabit}
+              onToggleComplete={handleToggleCompletion}
+            />
+          </>
+        )}
+      </main>
+    </>
+  );
+}
+// Rename export
+export default DashboardPage;

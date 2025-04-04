@@ -19,3 +19,18 @@ export interface HeatmapValue {
   date: string; // Expects 'YYYY-MM-DD' typically
   count: number; // We'll use 1 for completed, 0 for not
 }
+
+export interface AuthResponse {
+  // Assuming backend returns user object fields directly + token
+  _id: string;
+  username: string;
+  email: string;
+  token: string;
+  // Add any other fields your backend sends on login/register success
+}
+
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+}

@@ -1,11 +1,9 @@
-// client/src/services/api.ts
-import axios from "axios";
-import { Habit } from "../types"; // Import the Habit type
 
-// Define the base URL of your backend server
-// Make sure your backend server is running!
+import axios from "axios";
+import { Habit, User, AuthResponse } from "../types"; // Adjust path as needed
+
 const API_BASE_URL =
-  import.meta.env.VITE_APP_API_URL || "http://localhost:3000/api"; // Use environment variable or default
+  import.meta.env.VITE_APP_API_URL || "http://localhost:3000/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -14,31 +12,112 @@ const apiClient = axios.create({
   },
 });
 
-// --- API Functions ---
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Error in API request interceptor:", error);
+    return Promise.reject(error);
+  }
+);
 
-// Fetch all habits
+interface RegisterInput {
+    username: string;
+    email: string;
+    password: string;
+}
+
+interface LoginInput {
+    email: string;
+    password: string;
+}
+
+// --- Authentication API Functions ---
+// Use RegisterInput type for userData parameter
+export const registerUser = async (userData: RegisterInput): Promise<AuthResponse> => {
+    try {
+        const response = await apiClient.post<AuthResponse>(
+          '/auth/register',
+          userData
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error registering user:', error);
+        if (axios.isAxiosError(error)) {
+            throw error.response?.data || new Error('Registration failed due to network or server error.');
+        } else if (error instanceof Error) { throw error; }
+        else { throw new Error('An unknown error occurred during registration.'); }
+    }
+};
+
+// Use LoginInput type for credentials parameter
+export const loginUser = async (credentials: LoginInput): Promise<AuthResponse> => {
+    try {
+        const response = await apiClient.post<AuthResponse>(
+          '/auth/login',
+          credentials
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error logging in:', error);
+        if (axios.isAxiosError(error)) {
+            throw error.response?.data || new Error('Login failed due to network or server error.');
+        } else if (error instanceof Error) { throw error; }
+        else { throw new Error('An unknown error occurred during login.'); }
+    }
+};
+
+// --- Habit API Functions ---
+
 export const getHabits = async (): Promise<Habit[]> => {
   try {
     const response = await apiClient.get<Habit[]>("/habits");
     return response.data;
   } catch (error) {
     console.error("Error fetching habits:", error);
-    throw error; // Re-throw error to be handled by the calling component
+    // --- Type Narrowing ---
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Fetching habits failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred while fetching habits.");
+    }
+    // --- End Type Narrowing ---
   }
 };
 
-// Create a new habit
+
 export const createHabit = async (name: string): Promise<Habit> => {
   try {
     const response = await apiClient.post<Habit>("/habits", { name });
     return response.data;
   } catch (error) {
     console.error("Error creating habit:", error);
-    throw error;
+    // --- Type Narrowing ---
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Creating habit failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred while creating habit.");
+    }
+    // --- End Type Narrowing ---
   }
 };
 
-// Delete a habit by ID
+// Example for deleteHabit:
 export const deleteHabit = async (
   id: string
 ): Promise<{ message: string; id: string }> => {
@@ -49,21 +128,30 @@ export const deleteHabit = async (
     return response.data;
   } catch (error) {
     console.error("Error deleting habit:", error);
-    throw error;
+    // --- Type Narrowing ---
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Deleting habit failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred while deleting habit.");
+    }
+    // --- End Type Narrowing ---
   }
 };
 
-// Toggle completion status for a specific date (send date as YYYY-MM-DD)
+// Example for toggleHabitCompletion:
 export const toggleHabitCompletion = async (
   id: string,
   dateString: string
 ): Promise<Habit> => {
-  // Ensure dateString is in YYYY-MM-DD format before sending
-  // Example validation (can be more robust)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    throw new Error("Invalid date format for API. Use YYYY-MM-DD.");
+    // Keep specific validation error
+    throw new Error("Invalid date format for API. Use<x_bin_440>-MM-DD.");
   }
-
   try {
     const response = await apiClient.patch<Habit>(
       `/habits/${id}/toggle/${dateString}`
@@ -71,6 +159,17 @@ export const toggleHabitCompletion = async (
     return response.data;
   } catch (error) {
     console.error("Error toggling habit completion:", error);
-    throw error;
+    // --- Type Narrowing ---
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Toggling completion failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred while toggling completion.");
+    }
+    // --- End Type Narrowing ---
   }
 };

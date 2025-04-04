@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const habitRoutes = require("./routes/habitRoute");
+const authRoutes = require("./routes/authRoute");
 
 // Initialize Express app
 const app = express();
@@ -12,6 +13,7 @@ const app = express();
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // Enable parsing of JSON request bodies
 app.use("/api/habits", habitRoutes);
+app.use("/api/auth", authRoutes);
 
 // Basic Route (for testing)
 app.get("/", (req, res) => {
