@@ -1,6 +1,6 @@
 
 import axios from "axios";
-import { Habit, User, AuthResponse } from "../types"; // Adjust path as needed
+import { Habit, AuthResponse } from "../types"; // Adjust path as needed
 
 const API_BASE_URL =
   import.meta.env.VITE_APP_API_URL || "http://localhost:3000/api";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 
@@ -9,7 +8,7 @@ import LoginPage from "./pages/LoginPage"; // We will create this
 import RegisterPage from "./pages/RegisterPage"; // We will create this
 
 // Import Components
-import ProtectedRoute from "./components/ProtectedRotes";
+import ProtectedRoute from "./components/ProtectedRoutes";
 import NavBar from "./components/NavBar"; // We will create this
 
 function App() {
