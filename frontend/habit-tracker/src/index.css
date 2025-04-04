@@ -1,1 +1,66 @@
 @import "tailwindcss";
+
+/* Import base styles for react-calendar-heatmap */
+@import "react-calendar-heatmap/dist/styles.css";
+
+body {
+  @apply bg-gray-900;
+}
+
+.habit-heatmap rect:focus {
+  outline: none;
+  /* If you *want* a visible focus indicator for accessibility (recommended),
+     you could define a custom one here instead of outline: none.
+     Example: stroke: #3b82f6; /* Blue stroke */
+  /* stroke-width: 3; */
+}
+
+/* Custom styles for Habit Heatmap */
+.habit-heatmap .color-empty {
+  fill: theme("colors.gray.600"); /* Use Tailwind theme color */
+}
+
+.habit-heatmap .color-filled {
+  /* Use the CSS variable '--habit-color' defined inline on the component */
+  fill: var(--habit-color, theme("colors.green.500"));
+  /* fill: #22C55E; Hex for Tailwind green-500 as fallback */
+}
+
+/* Apply rounding and stroke gap to ALL day squares */
+.habit-heatmap .color-empty,
+.habit-heatmap .color-filled {
+  /* --- Rounded Corners --- */
+  /* Adjust the pixel value for more/less rounding */
+  rx: 2;
+  ry: 2;
+
+  stroke: theme("colors.gray.800"); /* White stroke/gap for LIGHT mode */
+  stroke-width: 2;
+}
+
+/* --- Label Alignment Fixes --- */
+
+/* Month Labels */
+.habit-heatmap .react-calendar-heatmap-month-label {
+  font-size: 8px; /* Smaller font size */
+  fill: theme("colors.white");
+  /* Alignment for month labels - library usually handles X */
+  text-anchor: middle; /* Center text above month columns */
+  alignment-baseline: start; /* Vertically align */
+  /* Removed margin-bottom, let library handle spacing or adjust Y if needed */
+}
+
+/* Weekday Labels */
+.habit-heatmap .react-calendar-heatmap-weekday-label {
+  font-size: 8px; /* Smaller font size */
+  fill: theme("colors.white");
+  /* Alignment for weekday labels - library usually positions left */
+  text-anchor: start; /* Align text to the right edge before the grid */
+  /* Add small horizontal offset if needed */
+  /* alignment-baseline: middle; */
+}
+
+/* Ensure tooltips work correctly */
+.react-tooltip {
+  z-index: 9999 !important; /* Make sure tooltip is on top */
+}
