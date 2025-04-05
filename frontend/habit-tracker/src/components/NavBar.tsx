@@ -1,4 +1,3 @@
-// client/src/components/Navbar.tsx
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FaListCheck } from "react-icons/fa6";
@@ -7,22 +6,20 @@ import { FaListCheck } from "react-icons/fa6";
 
 
 const Navbar = () => {
-  const { user, logout } = useAuth(); // Get user state and logout function
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Call logout from context
-    navigate("/login"); // Redirect to login page
-    // Optionally, could refresh window or clear other state if needed
+    logout();
+    navigate("/login"); 
   };
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-10">
       <div className="container mx-auto max-w-4xl px-4">
         {" "}
-        {/* Matches App container */}
+
         <div className="flex justify-between items-center py-3">
-          {/* Left Side: App Title/Logo */}
           <FaListCheck className="text-blue-200 size-12"/>
           <Link
             to="/"
@@ -31,17 +28,16 @@ const Navbar = () => {
             Habit Tracker
           </Link>
 
-          {/* Right Side: Theme Toggle & Auth Links/Info */}
           <div className="flex items-center gap-4">
             {" "}
-            {/* Conditional rendering based on user login status */}
+
             {user ? (
               <>
                 {" "}
-                {/* Fragment for logged-in user */}
+
                 <span className="text-white  text-sm hidden sm:block">
                   {" "}
-                  {/* Hide on small screens */}
+
                   Hi, {user.username}
                 </span>
                 <button
@@ -54,7 +50,6 @@ const Navbar = () => {
             ) : (
               <>
                 {" "}
-                {/* Fragment for logged-out user */}
                 <Link
                   to="/login"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"

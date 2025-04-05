@@ -1,8 +1,7 @@
-// client/src/components/HabitHeatmap.tsx
 import React, { useMemo } from "react";
 import CalendarHeatmap, {
   ReactCalendarHeatmapValue,
-  TooltipDataAttrs, // Import the missing type
+  TooltipDataAttrs,
 } from "react-calendar-heatmap";
 import { Tooltip } from "react-tooltip";
 import { Completion } from "../types";
@@ -28,47 +27,42 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({
   onToggleComplete,
 }) => {
   const endDate = useMemo(() => {
-    const today = new Date(); // Today (e.g., Apr 4th)
+    const today = new Date();
     const futureDate = new Date(today);
-    // Extend end date slightly into the future (e.g., 7 days)
-    // This helps ensure the current week/month structure looks complete.
+
     futureDate.setDate(today.getDate() + 7);
-    return futureDate; // End date is now ~ Apr 11th
+    return futureDate;
   }, []);
 
   const startDate = useMemo(() => {
-    // Calculate start date based on the NEW end date to keep duration similar
-    const date = new Date(endDate); // Start from the calculated endDate
-    // Go back roughly 9 months (adjust number as desired)
+    const date = new Date(endDate);
+
     date.setMonth(date.getMonth() - 9);
-    date.setDate(1); // Start from the 1st of that month
+    date.setDate(1);
     return date;
-  }, [endDate]); // Recalculate if endDate changes (it won't after initial render here)
-  // --- End Modified Date Range Calculation ---
+  }, [endDate]);
 
   const getTooltipDataAttrs = (
     value: ReactCalendarHeatmapValue<string> | undefined
   ): TooltipDataAttrs => {
     if (!value || !value.date) {
-      // Return attributes, but undefined content - react-tooltip should ignore this
       return {
         "data-tooltip-id": "heatmap-tooltip",
         "data-tooltip-content": undefined,
       } as TooltipDataAttrs;
     }
-    // Format the date nicely for the tooltip
+
     const dateStr = new Date(value.date + "T00:00:00.000Z").toLocaleDateString(
       "en-US",
       { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }
     );
-    // Return the full object when tooltip should be shown
+
     return {
       "data-tooltip-id": "heatmap-tooltip",
       "data-tooltip-content": `${dateStr}`,
     } as TooltipDataAttrs;
   };
 
-  // Create a map of completed dates for quick lookup
   const completedDatesMap = useMemo(() => {
     const map = new Map<string, boolean>();
     completions.forEach((comp) => {
@@ -84,7 +78,6 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({
     return map;
   }, [completions]);
 
-  // Generate all dates in the range, including empty ones
   const heatmapValues = useMemo(() => {
     const values: ReactCalendarHeatmapValue<string>[] = [];
     const currentDate = new Date(startDate);
@@ -116,24 +109,16 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({
     console.log("[HabitHeatmap] handleDayClick triggered. Value:", value);
 
     if (value && value.date) {
-      // value.date is the 'YYYY-MM-DD' string
+      const todayUTC = new Date();
 
-      // --- Corrected Date Comparison ---
-      const todayUTC = new Date(); // Get current date/time
-      // Set 'todayUTC' to represent midnight UTC of the current date
       todayUTC.setUTCHours(0, 0, 0, 0);
 
-      // 'clickedDate' is already UTC midnight because we parse 'YYYY-MM-DD' + 'T00:00:00.000Z'
       const clickedDate = new Date(value.date + "T00:00:00.000Z");
 
-      // Optional: Log dates for verification (both should be UTC midnight)
-
-      // Compare UTC midnight to UTC midnight
       if (clickedDate > todayUTC) {
         alert("Cannot mark future dates!");
         return;
       }
-      // --- End Corrected Date Comparison ---
 
       onToggleComplete(habitId, value.date);
     }
