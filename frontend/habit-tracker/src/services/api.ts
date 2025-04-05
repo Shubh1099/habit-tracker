@@ -1,6 +1,5 @@
-
 import axios from "axios";
-import { Habit, AuthResponse } from "../types"; // Adjust path as needed
+import { Habit, AuthResponse } from "../types";
 
 const API_BASE_URL =
   import.meta.env.VITE_APP_API_URL || "http://localhost:3000/api";
@@ -27,49 +26,62 @@ apiClient.interceptors.request.use(
 );
 
 interface RegisterInput {
-    username: string;
-    email: string;
-    password: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
 interface LoginInput {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
-// --- Authentication API Functions ---
-// Use RegisterInput type for userData parameter
-export const registerUser = async (userData: RegisterInput): Promise<AuthResponse> => {
-    try {
-        const response = await apiClient.post<AuthResponse>(
-          '/auth/register',
-          userData
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error registering user:', error);
-        if (axios.isAxiosError(error)) {
-            throw error.response?.data || new Error('Registration failed due to network or server error.');
-        } else if (error instanceof Error) { throw error; }
-        else { throw new Error('An unknown error occurred during registration.'); }
+export const registerUser = async (
+  userData: RegisterInput
+): Promise<AuthResponse> => {
+  try {
+    const response = await apiClient.post<AuthResponse>(
+      "/auth/register",
+      userData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error registering user:", error);
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Registration failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred during registration.");
     }
+  }
 };
 
-// Use LoginInput type for credentials parameter
-export const loginUser = async (credentials: LoginInput): Promise<AuthResponse> => {
-    try {
-        const response = await apiClient.post<AuthResponse>(
-          '/auth/login',
-          credentials
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error logging in:', error);
-        if (axios.isAxiosError(error)) {
-            throw error.response?.data || new Error('Login failed due to network or server error.');
-        } else if (error instanceof Error) { throw error; }
-        else { throw new Error('An unknown error occurred during login.'); }
+export const loginUser = async (
+  credentials: LoginInput
+): Promise<AuthResponse> => {
+  try {
+    const response = await apiClient.post<AuthResponse>(
+      "/auth/login",
+      credentials
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    if (axios.isAxiosError(error)) {
+      throw (
+        error.response?.data ||
+        new Error("Login failed due to network or server error.")
+      );
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An unknown error occurred during login.");
     }
+  }
 };
 
 // --- Habit API Functions ---
@@ -80,7 +92,6 @@ export const getHabits = async (): Promise<Habit[]> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching habits:", error);
-    // --- Type Narrowing ---
     if (axios.isAxiosError(error)) {
       throw (
         error.response?.data ||
@@ -91,10 +102,8 @@ export const getHabits = async (): Promise<Habit[]> => {
     } else {
       throw new Error("An unknown error occurred while fetching habits.");
     }
-    // --- End Type Narrowing ---
   }
 };
-
 
 export const createHabit = async (name: string): Promise<Habit> => {
   try {

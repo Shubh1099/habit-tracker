@@ -14,24 +14,21 @@ function DashboardPage() {
   useEffect(() => {
     const isMounted = true;
     let loadingTimerId: ReturnType<typeof setTimeout> | null = null;
-    console.log("[DashboardPage] Fetching habits effect running."); // Renamed log source
+    console.log("[DashboardPage] Fetching habits effect running.");
 
     const fetchAndLoad = async () => {
       const startTime = Date.now();
-      if (isMounted) setLoading(true); // Set loading for this page's fetch
+      if (isMounted) setLoading(true);
       if (isMounted) setError(null);
 
       try {
-        // API call will now automatically send token via interceptor
         const fetchedHabits = await api.getHabits();
         if (isMounted) {
           setHabits(fetchedHabits);
         }
       } catch (err: unknown) {
-        // Catch specific type if needed
         console.error("[DashboardPage] Error fetching habits:", err);
         if (isMounted) {
-          // Use error message from backend if available
           const errorMessage =
             err instanceof Error ? err.message : "Failed to add habit.";
           setError(errorMessage);
@@ -40,7 +37,7 @@ function DashboardPage() {
         if (isMounted) {
           const endTime = Date.now();
           const elapsedTime = endTime - startTime;
-          const remainingTime = Math.max(0, 2000 - elapsedTime); // Keep 2s delay
+          const remainingTime = Math.max(0, 2000 - elapsedTime);
           loadingTimerId = setTimeout(() => {
             setLoading(false);
           }, remainingTime);
@@ -76,7 +73,6 @@ function DashboardPage() {
   const handleDeleteHabit = useCallback(
     async (id: string) => {
       const originalHabits = [...habits];
-      /* ... existing logic using api.deleteHabit ... */
       try {
         setHabits((prevHabits) =>
           prevHabits.filter((habit) => habit._id !== id)
@@ -116,7 +112,6 @@ function DashboardPage() {
   return (
     <>
       {" "}
-      {/* Use Fragment or a simple div if needed */}
       <header className="text-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-3xl font-bold text-gray-100">My Habits</h1>{" "}
       </header>
@@ -139,7 +134,6 @@ function DashboardPage() {
         {!loading && !error && (
           <>
             {" "}
-            {/* Use Fragment to group Form and List */}
             <HabitList
               habits={habits}
               onDeleteHabit={handleDeleteHabit}
@@ -151,5 +145,4 @@ function DashboardPage() {
     </>
   );
 }
-// Rename export
 export default DashboardPage;

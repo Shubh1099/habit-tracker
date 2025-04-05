@@ -1,4 +1,3 @@
-// client/src/context/AuthContext.tsx
 import React, {
   createContext,
   useState,
@@ -10,32 +9,27 @@ import React, {
 import {User} from "../types"
 
 
-// Define the shape of the context value
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  isLoading: boolean; // To handle initial loading of auth state
+  isLoading: boolean;
   login: (userData: User, token: string) => void;
   logout: () => void;
-  register: (userData: User, token: string) => void; // Similar to login
+  register: (userData: User, token: string) => void;
 }
 
-// Create the context
-// Initialize with undefined or a default structure matching AuthContextType
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define props for the provider component
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Create the provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Start as true
+  const [isLoading, setIsLoading] = useState<boolean>(true); 
 
-  // Check localStorage for existing auth state on initial load
   useEffect(() => {
     try {
       const storedToken = localStorage.getItem("authToken");
@@ -43,19 +37,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser)); // Parse stored user string
+        setUser(JSON.parse(storedUser));
       }
     } catch (error) {
       console.error("Failed to load auth state from localStorage", error);
-      // Clear potentially corrupted storage
+  
       localStorage.removeItem("authToken");
       localStorage.removeItem("authUser");
     } finally {
-      setIsLoading(false); // Finished loading initial auth state
+      setIsLoading(false);
     }
-  }, []); // Run only once on mount
+  }, []); 
 
-  // Login function
   const login = (userData: User, jwtToken: string) => {
     setUser(userData);
     setToken(jwtToken);
@@ -64,7 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log("[AuthContext] User logged in:", userData);
   };
 
-  // Register function (similar to login after successful registration)
   const register = (userData: User, jwtToken: string) => {
     setUser(userData);
     setToken(jwtToken);
@@ -73,18 +65,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log("[AuthContext] User registered and logged in:", userData);
   };
 
-  // Logout function
+
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("authUser");
     localStorage.removeItem("authToken");
     console.log("[AuthContext] User logged out");
-    // Optional: Redirect here or where logout is called
-    // navigate('/login'); // If using useNavigate hook from react-router-dom
+
   };
 
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(
     () => ({
       user,
@@ -95,18 +85,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       register,
     }),
     [user, token, isLoading]
-  ); // Dependencies for memoization
+  ); 
 
-  // Don't render children until initial auth check is complete
-  // You could show a global spinner here instead of null
   if (isLoading) {
-    return null; // Or <GlobalSpinner />;
+    return null;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use the auth context easily
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {

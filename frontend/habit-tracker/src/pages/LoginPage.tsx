@@ -1,9 +1,9 @@
 // client/src/pages/LoginPage.tsx
 import React, { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Your auth context hook
-import * as api from "../services/api"; // Your API service
-import { User } from "../types"; // Import User type if needed for casting
+import { useAuth } from "../context/AuthContext";
+import * as api from "../services/api";
+import { User } from "../types";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -11,15 +11,12 @@ const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { login, user } = useAuth(); // Get login function and current user from context
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine where to redirect after login
-  // If redirected from a protected route, 'from' will be in location state
-  const from = location.state?.from?.pathname || "/"; // Default to dashboard
+  const from = location.state?.from?.pathname || "/";
 
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
       navigate(from, { replace: true });
@@ -38,29 +35,22 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      // Call the login API function
       const response = await api.loginUser({ email, password });
 
-      // Prepare user data for the context (matching the User type)
       const userDataForContext: User = {
         _id: response._id,
         username: response.username,
         email: response.email,
-        // Ensure all fields required by the User type are included
       };
 
-      // Call the login function from AuthContext
       login(userDataForContext, response.token);
-
-      // Redirect to the intended page (dashboard or where they came from)
-      navigate(from, { replace: true }); // Use replace to avoid login page in history
-    } catch (err: string | any) {
-      // Catch errors from the API call
+    } catch (err: string | unknown) {
       console.error("Login failed:", err);
-      // Display error message (try to use message from backend response)
-      const message =
-        err?.message || "Login failed. Please check your credentials.";
-      setError(message);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -69,20 +59,17 @@ const LoginPage: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
       {" "}
-      {/* Adjust min-height based on navbar/footer */}
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
           Login to Your Account
         </h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Display Error Message */}
           {error && (
             <p className="text-center text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 p-2 rounded">
               {error}
             </p>
           )}
 
-          {/* Email Input */}
           <div>
             <label
               htmlFor="email"
@@ -103,8 +90,6 @@ const LoginPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-
-          {/* Password Input */}
           <div>
             <label
               htmlFor="password"
@@ -125,8 +110,6 @@ const LoginPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-
-          {/* Submit Button */}
           <div>
             <button
               type="submit"
@@ -137,8 +120,6 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
         </form>
-
-        {/* Link to Register Page */}
         <p className="text-sm text-center text-gray-600 dark:text-gray-400">
           Don't have an account?{" "}
           <Link

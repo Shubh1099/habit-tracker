@@ -1,32 +1,26 @@
-// client/src/types.ts
-
 export interface Completion {
-  _id?: string; // Optional: MongoDB subdocument ID
-  date: string; // Store as ISO String (YYYY-MM-DDTHH:mm:ss.sssZ) or just YYYY-MM-DD
+  _id?: string;
+  date: string;
 }
 
 export interface Habit {
-  _id: string; // MongoDB document ID
+  _id: string;
   name: string;
-  createdAt: string; // Store as ISO String
+  createdAt: string;
   completions: Completion[];
-  color?: string; // Optional color
-  // Add userId later if implementing auth: userId: string;
+  color?: string;
 }
 
-// Type for the data needed by react-calendar-heatmap
 export interface HeatmapValue {
-  date: string; // Expects 'YYYY-MM-DD' typically
-  count: number; // We'll use 1 for completed, 0 for not
+  date: string;
+  count: number;
 }
 
 export interface AuthResponse {
-  // Assuming backend returns user object fields directly + token
   _id: string;
   username: string;
   email: string;
   token: string;
-  // Add any other fields your backend sends on login/register success
 }
 
 export interface User {

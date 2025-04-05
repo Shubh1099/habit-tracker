@@ -1,9 +1,8 @@
-// client/src/pages/RegisterPage.tsx
 import React, { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; 
-import * as api from "../services/api"; 
-import { User } from "../types"; 
+import { useAuth } from "../context/AuthContext";
+import * as api from "../services/api";
+import { User } from "../types";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -13,19 +12,19 @@ const RegisterPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, user } = useAuth(); // Get register function and current user
-  const navigate = useNavigate();
+  const { register, user } = useAuth(); 
+  const navigate = useNavigate()
 
-  // Redirect if user is already logged in
+
   useEffect(() => {
     if (user) {
-      navigate("/", { replace: true }); // Redirect logged-in users to dashboard
+      navigate("/", { replace: true });
     }
   }, [user, navigate]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    // --- Validation ---
+   
     if (!username || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
@@ -38,7 +37,7 @@ const RegisterPage: React.FC = () => {
       setError("Password must be at least 6 characters long.");
       return;
     }
-    // --- End Validation ---
+
 
     if (isSubmitting) return;
 
@@ -46,27 +45,25 @@ const RegisterPage: React.FC = () => {
     setError(null);
 
     try {
-      // Call the register API function
+   
       const response = await api.registerUser({ username, email, password });
 
-      // Prepare user data for the context
+   
       const userDataForContext: User = {
         _id: response._id,
         username: response.username,
         email: response.email,
       };
 
-      // Call the register function from AuthContext (logs user in)
+    
       register(userDataForContext, response.token);
 
-      // Redirect to the main dashboard page after successful registration
       navigate("/", { replace: true });
-    } catch (err: any) {
-      // Catch errors from the API call
-      console.error("Registration failed:", err);
-      // Display error message (try to use message from backend response)
-      const message = err?.message || "Registration failed. Please try again.";
-      setError(message);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to register a user!";
+      setError(errorMessage);
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,14 +77,13 @@ const RegisterPage: React.FC = () => {
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           {" "}
-          {/* Reduced space slightly */}
-          {/* Display Error Message */}
+
           {error && (
             <p className="text-center text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 p-2 rounded">
               {error}
             </p>
           )}
-          {/* Username Input */}
+
           <div>
             <label
               htmlFor="username"
@@ -108,7 +104,7 @@ const RegisterPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-          {/* Email Input */}
+
           <div>
             <label
               htmlFor="email"
@@ -117,7 +113,7 @@ const RegisterPage: React.FC = () => {
               Email address
             </label>
             <input
-              id="email" /* ... props as in login */
+              id="email"
               name="email"
               type="email"
               autoComplete="email"
@@ -129,7 +125,7 @@ const RegisterPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-          {/* Password Input */}
+      
           <div>
             <label
               htmlFor="password"
@@ -138,7 +134,7 @@ const RegisterPage: React.FC = () => {
               Password (min. 6 characters)
             </label>
             <input
-              id="password" /* ... props as in login */
+              id="password" 
               name="password"
               type="password"
               autoComplete="new-password"
@@ -150,7 +146,7 @@ const RegisterPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-          {/* Confirm Password Input */}
+          
           <div>
             <label
               htmlFor="confirmPassword"
@@ -171,7 +167,7 @@ const RegisterPage: React.FC = () => {
               disabled={isSubmitting}
             />
           </div>
-          {/* Submit Button */}
+      
           <div>
             <button
               type="submit"
@@ -183,7 +179,7 @@ const RegisterPage: React.FC = () => {
           </div>
         </form>
 
-        {/* Link to Login Page */}
+ 
         <p className="text-sm text-center text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
           <Link
